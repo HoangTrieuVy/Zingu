@@ -1,0 +1,26 @@
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+.clang_complete
+.gcc-flags.json
+
+# Editors / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Python (tools/)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Captured telemetry
+*.csv
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
