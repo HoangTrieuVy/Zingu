@@ -38,7 +38,7 @@ Phase timings are open-loop and hardware-specific; see
 | ----------------------- | ------------------------------------------------------ |
 | `firmware/`             | PlatformIO project — the code that runs on the ESP32   |
 | `firmware/lib/`         | Self-contained modules (IMU, motors, control, recovery)|
-| `docs/`                 | Architecture, hardware BOM and wiring, tuning guide    |
+| `docs/`                 | Architecture, hardware BOM and wiring, tuning, references|
 | `tools/`                | Host-side scripts (live telemetry plotting)            |
 
 ## Quick start
