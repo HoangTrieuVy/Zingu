@@ -1,6 +1,6 @@
 # Tuning
 
-The gains shipped in `firmware/include/config.h` are placeholders. They will not
+The gains shipped in `05-firmware/include/config.h` are placeholders. They will not
 balance your robot. Work through this in order — tuning the outer loop before
 the inner loop is the most common way to waste an afternoon.
 

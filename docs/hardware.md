@@ -15,7 +15,7 @@
 
 ## Pinout
 
-Defined in `firmware/include/config.h`. Change it there, not in the code.
+Defined in `05-firmware/include/config.h`. Change it there, not in the code.
 
 | Function              | ESP32 pin |
 | --------------------- | --------- |

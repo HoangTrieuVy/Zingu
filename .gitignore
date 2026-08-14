@@ -17,9 +17,23 @@ __pycache__/
 .venv/
 venv/
 
-# Captured telemetry
+# Captured telemetry and calibration data (keep the directory, not the bulk)
 *.csv
 *.log
+data/**
+!data/**/
+!data/**/README.md
+!data/**/.gitkeep
+
+# Binary CAD — decide deliberately between Git LFS and keeping these local.
+# See 01-design/README.md. Uncomment to exclude:
+# 01-design/cad/vendor/**
+
+# Simulation and training artifacts
+07-train/**/checkpoints/
+07-train/**/runs/
+*.mp4
+wandb/
 
 # OS
 .DS_Store
