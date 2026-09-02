@@ -20,18 +20,18 @@ venv/
 # Captured telemetry and calibration data (keep the directory, not the bulk)
 *.csv
 *.log
-data/**
-!data/**/
-!data/**/README.md
-!data/**/.gitkeep
+*/data/**
+!*/data/**/
+!*/data/**/README.md
+!*/data/**/.gitkeep
 
 # Binary CAD — decide deliberately between Git LFS and keeping these local.
-# See 01-design/README.md. Uncomment to exclude:
-# 01-design/cad/vendor/**
+# See the version's design/README.md. Uncomment to exclude:
+# */design/cad/vendor/**
 
 # Simulation and training artifacts
-07-train/**/checkpoints/
-07-train/**/runs/
+*/train/**/checkpoints/
+*/train/**/runs/
 *.mp4
 wandb/
 

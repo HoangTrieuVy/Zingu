@@ -70,7 +70,7 @@ Work in `fit/`.
 | `excitation/` | Excitation signal design and identifiability analysis |
 | `fit/` | Loss definitions, sensitivity analysis, optimiser configs |
 | `../data/calibration/` | Raw captured datasets |
-| `../03-sim/mjcf/` | Updated with identified parameters — the calibrated model |
+| `../mjcf/` | Updated with identified parameters — the calibrated model |
 
 ## Gotchas
 

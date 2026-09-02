@@ -10,7 +10,7 @@ follows — streams timestamped telemetry good enough to identify the robot from
 ```bash
 pip install platformio
 
-cd 05-firmware
+cd firmware
 pio run                 # build
 pio run -t upload       # flash the ESP32
 pio device monitor      # watch telemetry at 115200 baud

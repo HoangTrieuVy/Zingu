@@ -16,7 +16,7 @@ you should not trust it for anything except structural sanity.
 3. **Free-spin test.** Apply constant torque to one wheel with the chassis pinned. Angular
    acceleration should match `τ / I_wheel` from CAD. If it doesn't, your inertia export
    is wrong — go back to stage 2 rather than compensating here.
-4. **Port the cascaded PID** from [`../05-firmware/`](../05-firmware/) — same structure,
+4. **Port the cascaded PID** from [`../firmware/`](../firmware/) — same structure,
    same gain semantics, so tuning insight transfers in both directions.
 5. **Balance it.** Tune until it holds upright and rejects a shove. Record the gains; they
    are the baseline that stage 7's learned policy has to beat.

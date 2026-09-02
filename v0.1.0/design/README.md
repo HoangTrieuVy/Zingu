@@ -21,7 +21,7 @@ work; Onshape is the easiest to script an export from.
 4. **Assign materials per part.** PLA vs PETG vs aluminium vs the actual density of a
    LiPo cell. This is where your inertia tensor comes from, and it is the cheapest
    accuracy you will ever buy.
-5. **Design for the printer** — see [`../04-fabricate/`](../04-fabricate/) for the
+5. **Design for the printer** — see [`../print/`](../print/) for the
    constraints to design against, and iterate here rather than in the slicer.
 6. **Write the BOM** as you go, in `bom/`, with supplier links and measured masses once
    parts arrive.
