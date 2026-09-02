@@ -1,62 +1,84 @@
-# Stage 5 — Firmware
+# v0.1.0 firmware — LQR state feedback
 
-**Goal:** ESP32 firmware that balances, recovers from falls, and — critically for what
-follows — streams timestamped telemetry good enough to identify the robot from.
+Arduino sketch for the ESP32. Open `BalanceBot_V4_LQR/BalanceBot_V4_LQR.ino` in the
+Arduino IDE and flash it.
 
-**Prerequisites:** assembled hardware from stage 4, PlatformIO installed.
+## First: secrets
 
-## Quick start
+The sketch joins your WiFi to serve its tuning UI. Credentials are not in the repo:
 
-```bash
-pip install platformio
-
-cd firmware
-pio run                 # build
-pio run -t upload       # flash the ESP32
-pio device monitor      # watch telemetry at 115200 baud
+```sh
+cd BalanceBot_V4_LQR
+cp secrets.h.example secrets.h
+# edit secrets.h with your own SSID and password
 ```
 
-On first boot the robot stays in `IDLE` and streams IMU readings. Lay it flat and leave
-it still for five seconds — it calibrates the gyro bias, then arms itself.
+`secrets.h` is gitignored. Do not commit it.
 
-## Layout
+## The controller
 
-| Path | Contents |
-| ---- | -------- |
-| `src/main.cpp` | Scheduler and top-level state machine |
-| `lib/Imu/` | MPU-6050 driver, bias calibration, complementary filter |
-| `lib/MotorDriver/` | TB6612FNG H-bridge, encoder counting |
-| `lib/BalanceController/` | Cascaded PID |
-| `lib/RecoveryManeuver/` | Open-loop wind-up and kick |
-| `lib/RobotState/` | Shared state struct and mode enum |
-| `include/config.h` | Pins, gains, limits. **Placeholders — tune before running** |
+One flat state-feedback law — four gains, no inner/outer split:
 
-Architecture rationale is in [`../docs/architecture.md`](../docs/architecture.md); the
-hand-tuning procedure is in [`../docs/tuning.md`](../docs/tuning.md).
+```cpp
+u = K1*angle + K2*angleRate + K3*wheelSpeed + K4*position;   // acceleration
+velCmd += u * dt;                                            // steppers take velocity
+```
 
-## What stage 6 needs from this firmware
+| state | source | unit |
+|---|---|---|
+| `angle` | Kalman | ° |
+| `angleRate` | gyro − estimated bias | °/s |
+| `wheelSpeed` | commanded step rate | ksteps/s |
+| `position` | steps counted in the ISR | ksteps |
 
-The identification stage cannot work with telemetry designed only for human debugging.
-Before starting stage 6, this firmware needs:
+All four gains are normally positive.
 
-1. **Timestamps from the device**, not from host arrival time. USB serial jitter is
-   milliseconds and will be mistaken for actuator lag.
-2. **Raw values alongside filtered ones.** Log the raw gyro and accelerometer, not just
-   the fused angle — the fusion filter is itself a parameter you may want to identify.
-3. **Commanded torque *and* measured current**, so the actuator model has both sides.
-4. **An open-loop excitation mode** that plays a scripted signal — chirp, PRBS, multisine —
-   with the balance controller disabled. Without this the robot is not identifiable; see
-   stage 6.
-5. **Deterministic loop timing**, with any missed deadline flagged in the log rather than
-   silently absorbed.
-6. **A logging rate at least 5× your fastest dynamics.** For a balancer, 200 Hz minimum,
-   500 Hz preferred.
+`u` is an **acceleration**. A stepper is a velocity device, so `u` is integrated into
+`velCmd` before it reaches the wheels — holding a tilted robot up requires sustained
+wheel acceleration, and a constant wheel speed produces no righting force at all.
 
-## Gotchas
+## ARM vs ENGAGE
 
-- **Bench-test with wheels off the ground.** The recovery maneuver applies full torque.
-- **Gains do not transfer between chassis.** The values in `config.h` are placeholders and
-  a different battery position alone can invalidate them.
-- **Watch for encoder aliasing at speed.** During the recovery kick the wheels spin far
-  faster than during balancing, and a counting scheme that works at balance speeds may
-  silently lose counts during the kick.
+- **ARM** — you press it. The robot is now *allowed* to balance.
+- **ENGAGE** — the robot decides: it engages within 2° of upright, and disengages past 40°.
+
+So you can pick the robot up (motors stop) and stand it back down (it catches itself)
+without touching your phone. `DISARM` stops it for good. The status line shows `[ON]`
+only when actually engaged.
+
+## Tuning — 4 gains, in this order
+
+Start with **K3 = K4 = 0**. That gives pure angle stabilisation: it will balance but
+drift. Get that solid first.
+
+| step | gain | start | what you're looking for |
+|---|---|---|---|
+| 1 | **K1** angle | 1200 | Raise until it just oscillates, back off ~20% |
+| 2 | **K2** rate | 60 | Raise until the oscillation damps out |
+| 3 | **K3** speed | 1000 | Push it — it should stop instead of running away |
+| 4 | **K4** position | 400 | It should now return to where it engaged |
+| 5 | **targetAngle** | 0 | Trim out any residual steady drift |
+
+Plot group 3 shows `K1ang K2rate K3vel K4pos u` — the four terms side by side, so you
+can see which one is actually driving the wheels and which is doing nothing.
+
+> The starting values are estimates derived from the integration scale, not
+> measurements. Expect to move them by a factor of 2–3. The *order* matters far more
+> than the starting numbers.
+
+If a gain makes things worse as you raise it, that term's sign is wrong for your
+wiring — negate it.
+
+## What else is in there
+
+20 kHz DDS stepper ISR, Kalman angle filter, step-counting odometry, a web tuning UI
+on `balance2.local`, NVS gain persistence, plot groups and watchdogs. See
+[`../docs/architecture.md`](../docs/architecture.md) and
+[`../docs/tuning.md`](../docs/tuning.md).
+
+## Provenance
+
+This is the pre-split V2 LQR sketch reassembled into one file, recovered from the
+Arduino build cache. It excludes later V3 work (rail/stall watchdog, boot reason,
+no-cache headers, newer UI). An earlier cascade-PID controller exists but is not
+carried in this repository.

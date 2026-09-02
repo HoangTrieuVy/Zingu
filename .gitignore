@@ -38,3 +38,6 @@ wandb/
 # OS
 .DS_Store
 Thumbs.db
+
+# Firmware secrets (WiFi credentials) — copy secrets.h.example to secrets.h
+secrets.h
