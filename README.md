@@ -10,7 +10,6 @@ performs a wheel-torque kick-up to swing itself back into the balance envelope.
 
 ## What this repository is
 
-Most robot repos give you the firmware and leave the other 90% as an exercise.
 Every version of Zingu is open source all the way down:
 
 - **Sketches and CAD** — the original design files, not just an exported mesh
